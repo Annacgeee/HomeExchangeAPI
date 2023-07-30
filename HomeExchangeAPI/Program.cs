@@ -1,8 +1,32 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using HomeExchangeAPI.Data;
+using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Serilog;
+using Microsoft.Extensions.Logging;
+
+
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+// Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.File("log/homeLogs.txt",rollingInterval : RollingInterval.Day).CreateLogger();
+
+// builder.Host.UseSerilog();
+var connectionString = builder.Configuration.GetConnectionString("DefaultSQLConnection");
+ Console.WriteLine($"Connection string: {connectionString}");
+
+builder.Services.AddDbContextPool<ApplicationDbContext>(options => {
+    
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection"));
+
+}); 
+
+
+builder.Services.AddControllers(option => {
+
+})
+.AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
