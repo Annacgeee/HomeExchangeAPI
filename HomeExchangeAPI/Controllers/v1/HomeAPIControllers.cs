@@ -1,8 +1,10 @@
 using HomeExchangeAPI.Data;
+using HomeExchangeAPI.Models;
 using HomeExchangeAPI.Models.Dto;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HomeExchangeAPI.Controllers.v1
 {
@@ -12,17 +14,21 @@ namespace HomeExchangeAPI.Controllers.v1
     [ApiController]
     public class HomeExchangeAPIController : ControllerBase
     {
-        private readonly ILogger<HomeExchangeAPIController> _logger;
-        public HomeExchangeAPIController(ILogger<HomeExchangeAPIController> logger) {
-            _logger = logger;
+       
+        
+          private readonly ApplicationDbContext _db;
+
+        public HomeExchangeAPIController(ApplicationDbContext db) {
+            _db = db;
         }
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<HomeDTO>> getHomes() {
-            _logger.LogInformation("Getting all homes");
-            return Ok(HomeStore.homeList);
+           
+            return Ok(_db.Homes.ToList());
             }
         
+      
 
         [HttpGet("{id:int}", Name="GetHome")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -30,10 +36,10 @@ namespace HomeExchangeAPI.Controllers.v1
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<HomeDTO> GetHome(int id) {
             if (id == 0) {
-                _logger.LogError("Get home error with Id" +  id);
+                
                 return BadRequest();
             }
-            var home = HomeStore.homeList.FirstOrDefault(u=>u.Id == id);
+            var home = _db.Homes.FirstOrDefault(u=>u.Id == id);
             if (home == null) {
                 return NotFound();
             }
@@ -45,9 +51,9 @@ namespace HomeExchangeAPI.Controllers.v1
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<HomeDTO> CreateHome([FromBody]HomeDTO homeDTO) {
+        public ActionResult<HomeDTO> CreateHome([FromBody]HomeCreateDTO homeDTO) {
 
-            if (HomeStore.homeList.FirstOrDefault(u => u.Name.ToLower() == homeDTO.Name.ToLower()) != null){
+            if (_db.Homes.FirstOrDefault(u => u.Name.ToLower() == homeDTO.Name.ToLower()) != null){
                  ModelState.AddModelError("customError","Home already exists!");
                  return BadRequest(ModelState);
             }
@@ -55,13 +61,23 @@ namespace HomeExchangeAPI.Controllers.v1
                 return BadRequest(homeDTO);
             }
 
-            if (homeDTO.Id > 0) {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-            homeDTO.Id = HomeStore.homeList.OrderByDescending(u=>u.Id).FirstOrDefault().Id + 1;
-            HomeStore.homeList.Add(homeDTO);
+            // if (homeDTO.Id > 0) {
+            //     return StatusCode(StatusCodes.Status500InternalServerError);
+            // }
+            Home model = new Home(){
+                Amenity = homeDTO.Amenity,
+                Details = homeDTO.Details,
+            
+                ImageUrl= homeDTO.ImageUrl,
+                Name=homeDTO.Name,
+                Occupancy=homeDTO.Occupancy,
+                Rate=homeDTO.Rate,
+                Sqft= homeDTO.Sqft
+            };
+            _db.Homes.Add(model);
+            _db.SaveChanges();
 
-            return CreatedAtRoute("GetHome", new {id=homeDTO.Id},homeDTO);
+            return CreatedAtRoute("GetHome", new {id=model.Id},model);
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -73,26 +89,39 @@ namespace HomeExchangeAPI.Controllers.v1
             if (id == 0) {
                 return BadRequest();
             }
-            var home = HomeStore.homeList.FirstOrDefault(u=>u.Id == id);
+            var home = _db.Homes.FirstOrDefault(u=>u.Id == id);
             if (home == null)
             {
                 return NotFound();
             }
-            HomeStore.homeList.Remove(home);
+            _db.Homes.Remove(home);
+            _db.SaveChanges();
             return NoContent();
         }
 
         [HttpPut("{id:int}", Name="UpdateHome")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult UpdateHome(int id, [FromBody]HomeDTO homeDTO){
+        public IActionResult UpdateHome(int id, [FromBody]HomeUpdateDTO homeDTO){
             if (homeDTO == null || id != homeDTO.Id){
                 return BadRequest();
             }
-            var home = HomeStore.homeList.FirstOrDefault(u=> u.Id == id)!;
-            home.Name= homeDTO.Name;
-            home.Sqft = homeDTO.Sqft;
-            home.Occupancy= homeDTO.Occupancy;
+            // var home = HomeStore.homeList.FirstOrDefault(u=> u.Id == id)!;
+            // home.Name= homeDTO.Name;
+            // home.Sqft = homeDTO.Sqft;
+            // home.Occupancy= homeDTO.Occupancy;
+Home model = new Home(){
+                Amenity = homeDTO.Amenity,
+                Details = homeDTO.Details,
+                Id= homeDTO.Id,
+                ImageUrl= homeDTO.ImageUrl,
+                Name=homeDTO.Name,
+                Occupancy=homeDTO.Occupancy,
+                Rate=homeDTO.Rate,
+                Sqft= homeDTO.Sqft
+            };
+            _db.Homes.Update(model);
+            _db.SaveChanges();
 
             return NoContent();
         }
@@ -101,16 +130,43 @@ namespace HomeExchangeAPI.Controllers.v1
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
-        public IActionResult UpdatePartialHome(int id, JsonPatchDocument<HomeDTO> patchDTO){
+        public IActionResult UpdatePartialHome(int id, JsonPatchDocument<HomeUpdateDTO> patchDTO){
             if (patchDTO == null || id == 0){
                 return BadRequest();
             }
-            var home = HomeStore.homeList.FirstOrDefault(u=> u.Id == id)!;
+            var home = _db.Homes.AsNoTracking().FirstOrDefault(u=> u.Id == id)!;
+            
+
+            HomeUpdateDTO homeDTO = new() {
+                Amenity = home.Amenity,
+                Details = home.Details,
+                Id= home.Id,
+                ImageUrl= home.ImageUrl,
+                Name=home.Name,
+                Occupancy=home.Occupancy,
+                Rate=home.Rate,
+                Sqft= home.Sqft
+            };
+
             if (home == null) {
                 return BadRequest();
             }
 
-            patchDTO.ApplyTo(home, ModelState);
+            patchDTO.ApplyTo(homeDTO, ModelState);
+
+            Home model = new() {
+                Amenity = homeDTO.Amenity,
+                Details = homeDTO.Details,
+                Id= homeDTO.Id,
+                ImageUrl= homeDTO.ImageUrl,
+                Name=homeDTO.Name,
+                Occupancy=homeDTO.Occupancy,
+                Rate=homeDTO.Rate,
+                Sqft= homeDTO.Sqft
+            };
+
+            _db.Homes.Update(model);
+            _db.SaveChanges();
             if (!ModelState.IsValid){
                 return BadRequest(ModelState);
             }
