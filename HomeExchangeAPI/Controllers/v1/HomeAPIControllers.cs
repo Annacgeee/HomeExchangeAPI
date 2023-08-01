@@ -1,9 +1,11 @@
+using AutoMapper;
 using HomeExchangeAPI.Data;
 using HomeExchangeAPI.Models;
 using HomeExchangeAPI.Models.Dto;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.EntityFrameworkCore;
 
 namespace HomeExchangeAPI.Controllers.v1
@@ -17,65 +19,68 @@ namespace HomeExchangeAPI.Controllers.v1
        
         
           private readonly ApplicationDbContext _db;
+          private readonly IMapper _mapper;
 
-        public HomeExchangeAPIController(ApplicationDbContext db) {
+        public HomeExchangeAPIController(ApplicationDbContext db, IMapper mapper) {
             _db = db;
+            _mapper = mapper;
         }
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<HomeDTO>> getHomes() {
-           
-            return Ok(_db.Homes.ToList());
+        public async Task<ActionResult<IEnumerable<HomeDTO>>> getHomes() {
+            IEnumerable<Home> homeList = await _db.Homes.ToListAsync();
+            
+            return Ok(_mapper.Map<List<HomeDTO>>(homeList));
             }
         
-      
-
         [HttpGet("{id:int}", Name="GetHome")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<HomeDTO> GetHome(int id) {
+        public async Task<ActionResult<HomeDTO>> GetHome(int id) {
             if (id == 0) {
                 
                 return BadRequest();
             }
-            var home = _db.Homes.FirstOrDefault(u=>u.Id == id);
+            var home = await _db.Homes.FirstOrDefaultAsync(u=>u.Id == id);
             if (home == null) {
                 return NotFound();
             }
 
-            return Ok(home);
+            return Ok(_mapper.Map<HomeDTO>(home));
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<HomeDTO> CreateHome([FromBody]HomeCreateDTO homeDTO) {
+        public async Task<ActionResult<HomeDTO>> CreateHome([FromBody]HomeCreateDTO createDTO) {
 
-            if (_db.Homes.FirstOrDefault(u => u.Name.ToLower() == homeDTO.Name.ToLower()) != null){
+            if (await _db.Homes.FirstOrDefaultAsync(u => u.Name.ToLower() == createDTO.Name.ToLower()) != null){
                  ModelState.AddModelError("customError","Home already exists!");
                  return BadRequest(ModelState);
             }
-            if (homeDTO == null) {
-                return BadRequest(homeDTO);
+            if (createDTO == null) {
+                return BadRequest(createDTO);
             }
 
             // if (homeDTO.Id > 0) {
             //     return StatusCode(StatusCodes.Status500InternalServerError);
             // }
-            Home model = new Home(){
-                Amenity = homeDTO.Amenity,
-                Details = homeDTO.Details,
+
+            Home model = _mapper.Map<Home>(createDTO);
+            // Home model = new Home(){
+            //     Amenity = createDTO.Amenity,
+            //     Details = createDTO.Details,
             
-                ImageUrl= homeDTO.ImageUrl,
-                Name=homeDTO.Name,
-                Occupancy=homeDTO.Occupancy,
-                Rate=homeDTO.Rate,
-                Sqft= homeDTO.Sqft
-            };
-            _db.Homes.Add(model);
-            _db.SaveChanges();
+            //     ImageUrl= createDTO.ImageUrl,
+            //     Name=createDTO.Name,
+            //     Occupancy=createDTO.Occupancy,
+            //     Rate=createDTO.Rate,
+            //     Sqft= createDTO.Sqft
+            // };
+            await _db.Homes.AddAsync(model);
+            await _db.SaveChangesAsync();
 
             return CreatedAtRoute("GetHome", new {id=model.Id},model);
         }
@@ -85,43 +90,32 @@ namespace HomeExchangeAPI.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
       
         [HttpDelete("{id:int}", Name = "DeleteHome")]
-        public IActionResult DeleteHome(int id){
+        public async Task<IActionResult> DeleteHome(int id){
             if (id == 0) {
                 return BadRequest();
             }
-            var home = _db.Homes.FirstOrDefault(u=>u.Id == id);
+            var home = await _db.Homes.FirstOrDefaultAsync(u=>u.Id == id);
             if (home == null)
             {
                 return NotFound();
             }
             _db.Homes.Remove(home);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return NoContent();
         }
 
         [HttpPut("{id:int}", Name="UpdateHome")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult UpdateHome(int id, [FromBody]HomeUpdateDTO homeDTO){
-            if (homeDTO == null || id != homeDTO.Id){
+        public async Task<IActionResult> UpdateHome(int id, [FromBody]HomeUpdateDTO updateDTO){
+            if (updateDTO == null || id != updateDTO.Id){
                 return BadRequest();
             }
-            // var home = HomeStore.homeList.FirstOrDefault(u=> u.Id == id)!;
-            // home.Name= homeDTO.Name;
-            // home.Sqft = homeDTO.Sqft;
-            // home.Occupancy= homeDTO.Occupancy;
-Home model = new Home(){
-                Amenity = homeDTO.Amenity,
-                Details = homeDTO.Details,
-                Id= homeDTO.Id,
-                ImageUrl= homeDTO.ImageUrl,
-                Name=homeDTO.Name,
-                Occupancy=homeDTO.Occupancy,
-                Rate=homeDTO.Rate,
-                Sqft= homeDTO.Sqft
-            };
+            
+            Home model = _mapper.Map<Home>(updateDTO);
+
             _db.Homes.Update(model);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             return NoContent();
         }
@@ -130,43 +124,26 @@ Home model = new Home(){
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
-        public IActionResult UpdatePartialHome(int id, JsonPatchDocument<HomeUpdateDTO> patchDTO){
+        public async Task<IActionResult> UpdatePartialHome(int id, JsonPatchDocument<HomeUpdateDTO> patchDTO){
             if (patchDTO == null || id == 0){
                 return BadRequest();
             }
-            var home = _db.Homes.AsNoTracking().FirstOrDefault(u=> u.Id == id)!;
+            var home = await _db.Homes.AsNoTracking().FirstOrDefaultAsync(u=> u.Id == id)!;
+
+            HomeUpdateDTO homeDTO = _mapper.Map<HomeUpdateDTO>(home);
             
 
-            HomeUpdateDTO homeDTO = new() {
-                Amenity = home.Amenity,
-                Details = home.Details,
-                Id= home.Id,
-                ImageUrl= home.ImageUrl,
-                Name=home.Name,
-                Occupancy=home.Occupancy,
-                Rate=home.Rate,
-                Sqft= home.Sqft
-            };
 
             if (home == null) {
                 return BadRequest();
             }
 
             patchDTO.ApplyTo(homeDTO, ModelState);
-
-            Home model = new() {
-                Amenity = homeDTO.Amenity,
-                Details = homeDTO.Details,
-                Id= homeDTO.Id,
-                ImageUrl= homeDTO.ImageUrl,
-                Name=homeDTO.Name,
-                Occupancy=homeDTO.Occupancy,
-                Rate=homeDTO.Rate,
-                Sqft= homeDTO.Sqft
-            };
-
+            
+            Home model = _mapper.Map<Home>(homeDTO);
+            
             _db.Homes.Update(model);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             if (!ModelState.IsValid){
                 return BadRequest(ModelState);
             }
