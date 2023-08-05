@@ -8,11 +8,13 @@ namespace HomeExchangeAPI
     {
         public MappingConfig()
         {
-            CreateMap<Home, HomeDTO>();
-            CreateMap<HomeDTO, Home>();
-
+            CreateMap<Home, HomeDTO>().ReverseMap();
             CreateMap<Home, HomeCreateDTO>().ReverseMap();
             CreateMap<Home, HomeUpdateDTO>().ReverseMap();
+
+            CreateMap<HomeNumber, HomeNumberDTO>().ReverseMap();
+            CreateMap<HomeNumber, HomeNumberCreateDTO>().ReverseMap();
+            CreateMap<HomeNumber, HomeNumberUpdateDTO>().ReverseMap();
         }
     }
 }

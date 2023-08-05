@@ -15,7 +15,7 @@ namespace HomeExchangeAPI.Data
 
         // public DbSet<LocalUser> LocalUsers { get; set; }
         public DbSet<Home> Homes { get; set; }
-        // public DbSet<VillaNumber> VillaNumbers { get; set; }
+        public DbSet<HomeNumber> HomeNumbers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -4,6 +4,9 @@ using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Serilog;
 using Microsoft.Extensions.Logging;
 using HomeExchangeAPI;
+using HomeExchangeAPI.Repository.IRepository;
+using HomeExchangeAPI.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,8 +34,11 @@ builder.Services.AddControllers(option => {
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
+builder.Services.AddScoped<IHomeRepository, HomeRepository>();
+builder.Services.AddScoped<IHomeNumberRepository, HomeNumberRepository>();
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -44,7 +50,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

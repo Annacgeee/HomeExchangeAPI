@@ -1,12 +1,11 @@
+using System.Net;
 using AutoMapper;
-using HomeExchangeAPI.Data;
 using HomeExchangeAPI.Models;
 using HomeExchangeAPI.Models.Dto;
-using Microsoft.AspNetCore.Http.HttpResults;
+using HomeExchangeAPI.Repository.IRepository;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Localization;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace HomeExchangeAPI.Controllers.v1
 {
@@ -17,46 +16,74 @@ namespace HomeExchangeAPI.Controllers.v1
     public class HomeExchangeAPIController : ControllerBase
     {
        
-        
-          private readonly ApplicationDbContext _db;
+        protected APIResponse _response;
+          private readonly IHomeRepository _dbHome;
           private readonly IMapper _mapper;
 
-        public HomeExchangeAPIController(ApplicationDbContext db, IMapper mapper) {
-            _db = db;
+        public HomeExchangeAPIController(IHomeRepository db, IMapper mapper) {
+            _dbHome = db;
             _mapper = mapper;
+            this._response = new();
         }
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<HomeDTO>>> getHomes() {
-            IEnumerable<Home> homeList = await _db.Homes.ToListAsync();
-            
-            return Ok(_mapper.Map<List<HomeDTO>>(homeList));
+        public async Task<ActionResult<APIResponse>> getHomes() {
+            try {
+            IEnumerable<Home> homeList = await _dbHome.GetAllAsync();
+            _response.Result=_mapper.Map<List<HomeDTO>>(homeList);
+            _response.StatusCode = HttpStatusCode.OK;
+            return Ok(_response);
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages = new List<string>(){ex.ToString()};
+            }
+
+            return _response;
+
             }
         
         [HttpGet("{id:int}", Name="GetHome")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<HomeDTO>> GetHome(int id) {
+        public async Task<ActionResult<APIResponse>> GetHome(int id) {
+
+            try{
+
+            
             if (id == 0) {
-                
-                return BadRequest();
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                return BadRequest(_response);
             }
-            var home = await _db.Homes.FirstOrDefaultAsync(u=>u.Id == id);
+            var home = await _dbHome.GetAsync(u => u.Id == id);
             if (home == null) {
                 return NotFound();
             }
 
-            return Ok(_mapper.Map<HomeDTO>(home));
+            _response.Result = _mapper.Map<HomeDTO>(home);
+            _response.StatusCode = HttpStatusCode.OK;
+           
+
+            return Ok(_response);
+             }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages = new List<string>(){ex.ToString()};
+            }
+
+            return _response;
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<HomeDTO>> CreateHome([FromBody]HomeCreateDTO createDTO) {
-
-            if (await _db.Homes.FirstOrDefaultAsync(u => u.Name.ToLower() == createDTO.Name.ToLower()) != null){
+        public async Task<ActionResult<APIResponse>> CreateHome([FromBody]HomeCreateDTO createDTO) {
+            try {
+            if (await _dbHome.GetAsync(u => u.Name.ToLower() == createDTO.Name.ToLower()) != null){
                  ModelState.AddModelError("customError","Home already exists!");
                  return BadRequest(ModelState);
             }
@@ -68,7 +95,7 @@ namespace HomeExchangeAPI.Controllers.v1
             //     return StatusCode(StatusCodes.Status500InternalServerError);
             // }
 
-            Home model = _mapper.Map<Home>(createDTO);
+            Home home = _mapper.Map<Home>(createDTO);
             // Home model = new Home(){
             //     Amenity = createDTO.Amenity,
             //     Details = createDTO.Details,
@@ -79,10 +106,20 @@ namespace HomeExchangeAPI.Controllers.v1
             //     Rate=createDTO.Rate,
             //     Sqft= createDTO.Sqft
             // };
-            await _db.Homes.AddAsync(model);
-            await _db.SaveChangesAsync();
+           
+            await _dbHome.CreateAsync(home);
+             _response.Result = _mapper.Map<HomeDTO>(home);
+            _response.StatusCode = HttpStatusCode.Created;
+           
+            return CreatedAtRoute("GetHome", new {id=home.Id},_response);
+             }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages = new List<string>(){ex.ToString()};
+            }
 
-            return CreatedAtRoute("GetHome", new {id=model.Id},model);
+            return _response;
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -90,34 +127,56 @@ namespace HomeExchangeAPI.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
       
         [HttpDelete("{id:int}", Name = "DeleteHome")]
-        public async Task<IActionResult> DeleteHome(int id){
+        public async Task<ActionResult<APIResponse>> DeleteHome(int id){
+            try {
             if (id == 0) {
                 return BadRequest();
             }
-            var home = await _db.Homes.FirstOrDefaultAsync(u=>u.Id == id);
+            var home = await _dbHome.GetAsync(u=>u.Id == id);
             if (home == null)
             {
                 return NotFound();
             }
-            _db.Homes.Remove(home);
-            await _db.SaveChangesAsync();
-            return NoContent();
+            await _dbHome.RemoveAsync(home);
+            _response.StatusCode = HttpStatusCode.NoContent;
+            _response.IsSuccess = true;
+            
+            return Ok(_response);
+             }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages = new List<string>(){ex.ToString()};
+            }
+
+            return _response;
         }
 
         [HttpPut("{id:int}", Name="UpdateHome")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateHome(int id, [FromBody]HomeUpdateDTO updateDTO){
+        public async Task<ActionResult<APIResponse>> UpdateHome(int id, [FromBody]HomeUpdateDTO updateDTO){
+            try {
             if (updateDTO == null || id != updateDTO.Id){
                 return BadRequest();
             }
             
             Home model = _mapper.Map<Home>(updateDTO);
 
-            _db.Homes.Update(model);
-            await _db.SaveChangesAsync();
+            await _dbHome.UpdateAsync(model);
+    
+            _response.StatusCode = HttpStatusCode.NoContent;
+            _response.IsSuccess = true;
+           
+            return Ok(_response);
+             }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages = new List<string>(){ex.ToString()};
+            }
 
-            return NoContent();
+            return _response;
         }
 
         [HttpPatch("{id:int}", Name="UpdatePartialHome")]
@@ -128,7 +187,7 @@ namespace HomeExchangeAPI.Controllers.v1
             if (patchDTO == null || id == 0){
                 return BadRequest();
             }
-            var home = await _db.Homes.AsNoTracking().FirstOrDefaultAsync(u=> u.Id == id)!;
+            var home = await _dbHome.GetAsync(u=> u.Id == id,tracked:false);
 
             HomeUpdateDTO homeDTO = _mapper.Map<HomeUpdateDTO>(home);
             
@@ -142,8 +201,8 @@ namespace HomeExchangeAPI.Controllers.v1
             
             Home model = _mapper.Map<Home>(homeDTO);
             
-            _db.Homes.Update(model);
-            await _db.SaveChangesAsync();
+            await _dbHome.UpdateAsync(model);
+           
             if (!ModelState.IsValid){
                 return BadRequest(ModelState);
             }

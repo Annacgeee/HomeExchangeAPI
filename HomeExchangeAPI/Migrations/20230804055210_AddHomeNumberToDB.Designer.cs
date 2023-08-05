@@ -4,6 +4,7 @@ using HomeExchangeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeExchangeAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230804055210_AddHomeNumberToDB")]
+    partial class AddHomeNumberToDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,7 +73,7 @@ namespace HomeExchangeAPI.Migrations
                         {
                             Id = 1,
                             Amenity = "",
-                            CreatedDate = new DateTime(2023, 8, 4, 16, 59, 11, 297, DateTimeKind.Local).AddTicks(8680),
+                            CreatedDate = new DateTime(2023, 8, 3, 22, 52, 10, 769, DateTimeKind.Local).AddTicks(2260),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa3.jpg",
                             Name = "Royal Villa",
@@ -83,7 +86,7 @@ namespace HomeExchangeAPI.Migrations
                         {
                             Id = 2,
                             Amenity = "",
-                            CreatedDate = new DateTime(2023, 8, 4, 16, 59, 11, 297, DateTimeKind.Local).AddTicks(8720),
+                            CreatedDate = new DateTime(2023, 8, 3, 22, 52, 10, 769, DateTimeKind.Local).AddTicks(2340),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa1.jpg",
                             Name = "Premium Pool Villa",
@@ -96,7 +99,7 @@ namespace HomeExchangeAPI.Migrations
                         {
                             Id = 3,
                             Amenity = "",
-                            CreatedDate = new DateTime(2023, 8, 4, 16, 59, 11, 297, DateTimeKind.Local).AddTicks(8720),
+                            CreatedDate = new DateTime(2023, 8, 3, 22, 52, 10, 769, DateTimeKind.Local).AddTicks(2340),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa4.jpg",
                             Name = "Luxury Pool Villa",
@@ -109,7 +112,7 @@ namespace HomeExchangeAPI.Migrations
                         {
                             Id = 4,
                             Amenity = "",
-                            CreatedDate = new DateTime(2023, 8, 4, 16, 59, 11, 297, DateTimeKind.Local).AddTicks(8730),
+                            CreatedDate = new DateTime(2023, 8, 3, 22, 52, 10, 769, DateTimeKind.Local).AddTicks(2350),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa5.jpg",
                             Name = "Diamond Villa",
@@ -122,7 +125,7 @@ namespace HomeExchangeAPI.Migrations
                         {
                             Id = 5,
                             Amenity = "",
-                            CreatedDate = new DateTime(2023, 8, 4, 16, 59, 11, 297, DateTimeKind.Local).AddTicks(8730),
+                            CreatedDate = new DateTime(2023, 8, 3, 22, 52, 10, 769, DateTimeKind.Local).AddTicks(2350),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa2.jpg",
                             Name = "Diamond Pool Villa",
@@ -141,9 +144,6 @@ namespace HomeExchangeAPI.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("HomeID")
-                        .HasColumnType("int");
-
                     b.Property<string>("SpecialDetails")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -153,20 +153,7 @@ namespace HomeExchangeAPI.Migrations
 
                     b.HasKey("HomeNo");
 
-                    b.HasIndex("HomeID");
-
                     b.ToTable("HomeNumbers");
-                });
-
-            modelBuilder.Entity("HomeExchangeAPI.Models.HomeNumber", b =>
-                {
-                    b.HasOne("HomeExchangeAPI.Models.Home", "Home")
-                        .WithMany()
-                        .HasForeignKey("HomeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Home");
                 });
 #pragma warning restore 612, 618
         }
