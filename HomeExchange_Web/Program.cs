@@ -10,6 +10,16 @@ builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 builder.Services.AddHttpClient<IHomeService, HomeService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
+ builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowFrontend",
+            builder =>
+            {
+                builder.WithOrigins("http://localhost:7001")
+                       .AllowAnyHeader()
+                       .AllowAnyMethod();
+            });
+    });
 
 var app = builder.Build();
 
@@ -21,11 +31,13 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseCors("AllowFrontend");
 app.UseAuthorization();
 
 app.MapControllerRoute(

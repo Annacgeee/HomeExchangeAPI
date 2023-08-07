@@ -21,7 +21,6 @@ namespace HomeExchange_Web.Services
         {
            try
            {
-
             Console.WriteLine("reached 25!!");
              var client = HttpClient.CreateClient("HomeExchangeAPI");
              HttpRequestMessage message = new();

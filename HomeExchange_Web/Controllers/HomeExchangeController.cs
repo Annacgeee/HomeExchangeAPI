@@ -30,5 +30,27 @@ namespace HomeExchange_Web.Controllers
             }
             return View(list);
         }
+
+          public async Task<IActionResult> CreateHome()
+        {
+            
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+          public async Task<IActionResult> CreateHome(HomeCreateDTO model)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _homeService.CreateAsync<APIResponse>(model);
+           
+            if (response != null && response.IsSuccess)
+            {
+                return RedirectToAction(nameof(IndexHome));
+            }
+            }
+            return View(model);
+        }
     }
 }

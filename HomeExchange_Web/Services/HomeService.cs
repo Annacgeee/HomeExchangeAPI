@@ -22,7 +22,7 @@ namespace HomeExchange_Web.Services
             {
                 ApiType = SD.ApiType.POST,
                 Data = dto,
-                Url = HomeUrl + "/api/v1/HomeExchangeAPI",
+                Url = HomeUrl + "/api/HomeExchangeAPI",
                 // Token = token
             });
         }
@@ -32,17 +32,18 @@ namespace HomeExchange_Web.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.DELETE,
-                Url = HomeUrl + "/api/v1/HomeExchangeAPI/" + id,
+                Url = HomeUrl + "/api/HomeExchangeAPI/" + id,
                 // Token = token
             });
         }
 
         public Task<T> GetAllAsync<T>()
         {
+            Console.WriteLine("here her 42");
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = HomeUrl + "/api/v1/HomeExchangeAPI",
+                Url = HomeUrl + "/api/HomeExchangeAPI",
                 // Token = token
             });
         }
@@ -52,7 +53,7 @@ namespace HomeExchange_Web.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = HomeUrl + "/api/v1/HomeExchangeAPI/" + id,
+                Url = HomeUrl + "/api/HomeExchangeAPI/" + id,
                 // Token = token
             });
         }
@@ -63,7 +64,7 @@ namespace HomeExchange_Web.Services
             {
                 ApiType = SD.ApiType.PUT,
                 Data = dto,
-                Url = HomeUrl + "/api/v1/HomeExchangeAPI/" + dto.Id,
+                Url = HomeUrl + "/api/HomeExchangeAPI/" + dto.Id,
                 // Token = token
             }) ;
         }
