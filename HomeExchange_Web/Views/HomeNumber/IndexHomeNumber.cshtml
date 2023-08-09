@@ -1,0 +1,42 @@
+@model IEnumerable<HomeExchange_Web.Models.Dto.HomeNumberDTO>
+<br />
+<div class="container p-4 border">
+    <div class="row pb-2">
+        <div class="col">
+            <h1 class="text-primary">Home Number List</h1>
+        </div>
+        <div class="col text-end pt-1">
+           <a asp-controller = "HomeNumber" asp-action="CreateHomeNumber" class="btn btn-outline-primary">
+                <i class="bi bi-plus-square-fill"></i> Create New Home Number</a>
+        </div>
+    </div>
+
+    <table class="table">
+		<thead>
+			<tr>
+				<th>
+					Home Name
+				</th>
+				<th>
+					Home Number
+				</th>
+				
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach(var item in Model){
+				<tr>
+					<td>@item.Home.Name</td>
+					<td>@item.HomeNo</td>
+					
+					<td>
+						<a asp-controller="HomeExchange" asp-action="UpdateHomeNumber" asp-route-homeNo="@item.HomeNo" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
+						<a asp-controller="HomeExchange" asp-action="DeleteHomeNumber" asp-route-homeNo="@item.HomeNo"  class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+					</td>
+				</tr>
+			}
+		</tbody>
+    </table>
+
+</div>

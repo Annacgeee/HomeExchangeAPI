@@ -14,7 +14,7 @@ namespace HomeExchangeAPI.Models
         [ForeignKey("Home")]
         public int HomeID { get; set; }
 
-        public Home Home {get; set;}
+        public Home Home {get; set;} // navigation property
         public DateTime CreatedDate {get; set;}
 
         public DateTime UpdatedDate{get;set;}

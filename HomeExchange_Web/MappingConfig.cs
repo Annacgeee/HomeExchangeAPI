@@ -12,6 +12,7 @@ namespace HomeExchange_Web
 
             CreateMap<HomeNumberDTO, HomeNumberCreateDTO>().ReverseMap();
             CreateMap<HomeNumberDTO, HomeNumberUpdateDTO>().ReverseMap();
+          
         }
     }
 }

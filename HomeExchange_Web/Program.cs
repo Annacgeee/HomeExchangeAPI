@@ -10,6 +10,9 @@ builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 builder.Services.AddHttpClient<IHomeService, HomeService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddHttpClient<IHomeNumberService, HomeNumberService>();
+builder.Services.AddScoped<IHomeNumberService, HomeNumberService>();
+
  builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowFrontend",

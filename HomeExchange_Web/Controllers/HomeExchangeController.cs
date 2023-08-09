@@ -52,5 +52,60 @@ namespace HomeExchange_Web.Controllers
             }
             return View(model);
         }
+
+          public async Task<IActionResult> UpdateHome(int homeId)
+        {
+            var response = await _homeService.GetAsync<APIResponse>(homeId);
+           
+            if (response != null && response.IsSuccess)
+            {
+                HomeDTO model = JsonConvert.DeserializeObject<HomeDTO>(Convert.ToString(response.Result));
+                return View(_mapper.Map<HomeUpdateDTO>(model)); 
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+          public async Task<IActionResult> UpdateHome(HomeUpdateDTO model)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _homeService.UpdateAsync<APIResponse>(model);
+           
+            if (response != null && response.IsSuccess)
+            {
+                return RedirectToAction(nameof(IndexHome));
+            }
+            }
+            return View(model);
+        }
+
+          public async Task<IActionResult> DeleteHome(int homeId)
+        {
+            var response = await _homeService.GetAsync<APIResponse>(homeId);
+           
+            if (response != null && response.IsSuccess)
+            {
+                HomeDTO model = JsonConvert.DeserializeObject<HomeDTO>(Convert.ToString(response.Result));
+                return View(model); 
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+          public async Task<IActionResult> DeleteHome(HomeDTO model)
+        {
+            
+            var response = await _homeService.DeleteAsync<APIResponse>(model.Id);
+           
+            if (response != null && response.IsSuccess)
+            {
+                return RedirectToAction(nameof(IndexHome));
+            }
+        
+            return View(model);
+        }
     }
 }

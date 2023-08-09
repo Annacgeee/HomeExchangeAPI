@@ -10,5 +10,7 @@ namespace HomeExchangeAPI.Models.Dto
         public int HomeID { get; set; }
 
         public string SpecialDetails {get;set;}
+
+        public HomeDTO Home  { get; set; }
     }
 }

@@ -45,8 +45,8 @@ namespace HomeExchangeAPI.Controllers.v1
             try
             {
 
-                // IEnumerable<HomeNumber> HomeNumberList = await _dbHomeNumber.GetAllAsync(includeProperties: "Home");
-                IEnumerable<Home> HomeNumberList = await _dbHome.GetAllAsync();
+                IEnumerable<HomeNumber> HomeNumberList = await _dbHomeNumber.GetAllAsync(includeProperties: "Home");
+               
                 _response.Result = _mapper.Map<List<HomeNumberDTO>>(HomeNumberList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
