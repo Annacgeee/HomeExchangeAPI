@@ -33,8 +33,10 @@ namespace HomeExchange_Web.Services
                 Encoding.UTF8, "application/json");
             }
             Console.WriteLine("reached 35!!");
+           
             switch (apiRequest.ApiType)
                 {
+                    
                     case SD.ApiType.POST:
                         message.Method = HttpMethod.Post;
                         break;
@@ -45,6 +47,7 @@ namespace HomeExchange_Web.Services
                         message.Method = HttpMethod.Delete;
                         break;
                     default:
+                    Console.WriteLine("reached in switch");
                         message.Method = HttpMethod.Get;
                         break;
 
@@ -56,15 +59,29 @@ namespace HomeExchange_Web.Services
                 // {
                 //     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiRequest.Token);
                 // }
-Console.WriteLine("reached 60 ");
+
                 apiResponse = await client.SendAsync(message);
-                Console.WriteLine("reached 62 ");
+             
                 var apiContent = await apiResponse.Content.ReadAsStringAsync();
-                Console.WriteLine("reached 64 ");
-               
+                try {
+                    APIResponse ApiResponse = JsonConvert.DeserializeObject<APIResponse>(apiContent);
+                    if (apiResponse.StatusCode == System.Net.HttpStatusCode.BadRequest || apiResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    {
+                        ApiResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                        ApiResponse.IsSuccess = false;
+
+                        var res = JsonConvert.SerializeObject(ApiResponse);
+                var returnObj = JsonConvert.DeserializeObject<T>(res);
+                return returnObj;
+                    }
+                }
+                catch(Exception ex) {
+                    var exceptionResponse = JsonConvert.DeserializeObject<T>(apiContent);
+                    return exceptionResponse;
+                }
                 var APIResponse = JsonConvert.DeserializeObject<T>(apiContent);
-                Console.WriteLine("reached 67 ");
                 return APIResponse;
+
            }
            catch(Exception e)
             {

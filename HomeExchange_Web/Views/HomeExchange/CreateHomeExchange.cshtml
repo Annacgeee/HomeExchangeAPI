@@ -1,6 +1,6 @@
 @model HomeExchange_Web.Models.Dto.HomeCreateDTO
 
-<form asp-action="CreateHome">
+<form asp-action="CreateHomeExchange">
     <br />
     <div class="container border p-3">
         <h1 class="text-primary">Create Home</h1>
@@ -65,7 +65,7 @@
                 <span asp-validation-for="Amenity" class="text-danger"></span>
             </div>
             <div class="col-5 offset-2">
-                <a asp-action="IndexHome" asp-controller="HomeExchange" class="btn-primary btn form-control ">Back to List</a>
+                <a asp-action="IndexHomeExchange" asp-controller="HomeExchange" class="btn-primary btn form-control ">Back to List</a>
             </div>
             <div class="col-5">
                 <input type="submit" value="Create" class="btn btn-success form-control" />

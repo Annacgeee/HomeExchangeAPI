@@ -18,7 +18,7 @@ namespace HomeExchange_Web.Controllers
             _homeService = homeService;
             _mapper = mapper;
         }
-        public async Task<IActionResult> IndexHome()
+        public async Task<IActionResult> IndexHomeExchange()
         {
              List<HomeDTO> list = new();
             
@@ -31,7 +31,7 @@ namespace HomeExchange_Web.Controllers
             return View(list);
         }
 
-          public async Task<IActionResult> CreateHome()
+          public async Task<IActionResult> CreateHomeExchange()
         {
             
             return View();
@@ -39,7 +39,7 @@ namespace HomeExchange_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-          public async Task<IActionResult> CreateHome(HomeCreateDTO model)
+          public async Task<IActionResult> CreateHomeExchange(HomeCreateDTO model)
         {
             if (ModelState.IsValid)
             {
@@ -47,13 +47,15 @@ namespace HomeExchange_Web.Controllers
            
             if (response != null && response.IsSuccess)
             {
-                return RedirectToAction(nameof(IndexHome));
+                TempData["success"] = "home created successfully!";
+                return RedirectToAction(nameof(IndexHomeExchange));
             }
             }
+            TempData["error"] = "error encounter!";
             return View(model);
         }
 
-          public async Task<IActionResult> UpdateHome(int homeId)
+          public async Task<IActionResult> UpdateHomeExchange(int homeId)
         {
             var response = await _homeService.GetAsync<APIResponse>(homeId);
            
@@ -67,7 +69,7 @@ namespace HomeExchange_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-          public async Task<IActionResult> UpdateHome(HomeUpdateDTO model)
+          public async Task<IActionResult> UpdateHomeExchange(HomeUpdateDTO model)
         {
             if (ModelState.IsValid)
             {
@@ -75,13 +77,15 @@ namespace HomeExchange_Web.Controllers
            
             if (response != null && response.IsSuccess)
             {
-                return RedirectToAction(nameof(IndexHome));
+                TempData["success"] = "home updated successfully!";
+                return RedirectToAction(nameof(IndexHomeExchange));
             }
             }
+            TempData["error"] = "error encounter!";
             return View(model);
         }
 
-          public async Task<IActionResult> DeleteHome(int homeId)
+          public async Task<IActionResult> DeleteHomeExchange(int homeId)
         {
             var response = await _homeService.GetAsync<APIResponse>(homeId);
            
@@ -95,16 +99,17 @@ namespace HomeExchange_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-          public async Task<IActionResult> DeleteHome(HomeDTO model)
+          public async Task<IActionResult> DeleteHomeExchange(HomeDTO model)
         {
             
             var response = await _homeService.DeleteAsync<APIResponse>(model.Id);
            
             if (response != null && response.IsSuccess)
             {
-                return RedirectToAction(nameof(IndexHome));
+                TempData["success"] = "home deleted successfully!";
+                return RedirectToAction(nameof(IndexHomeExchange));
             }
-        
+        TempData["error"] = "error encounter!";
             return View(model);
         }
     }
