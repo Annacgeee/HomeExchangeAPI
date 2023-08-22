@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Text;
 using HomeExchange_Utility;
 using HomeExchange_Web.Models;
@@ -21,18 +22,18 @@ namespace HomeExchange_Web.Services
         {
            try
            {
-            Console.WriteLine("reached 25!!");
+           
              var client = HttpClient.CreateClient("HomeExchangeAPI");
              HttpRequestMessage message = new();
              message.Headers.Add("Accept", "application/json");
              message.RequestUri = new Uri(apiRequest.Url);
              if (apiRequest.Data != null)
             {
-                Console.WriteLine("reached 32!!");
+                
                 message.Content = new StringContent(JsonConvert.SerializeObject(apiRequest.Data),
                 Encoding.UTF8, "application/json");
             }
-            Console.WriteLine("reached 35!!");
+           
            
             switch (apiRequest.ApiType)
                 {
@@ -55,10 +56,10 @@ namespace HomeExchange_Web.Services
 
                 HttpResponseMessage apiResponse = null;
 
-                // if (!string.IsNullOrEmpty(apiRequest.Token))
-                // {
-                //     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiRequest.Token);
-                // }
+                if (!string.IsNullOrEmpty(apiRequest.Token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiRequest.Token);
+                }
 
                 apiResponse = await client.SendAsync(message);
              

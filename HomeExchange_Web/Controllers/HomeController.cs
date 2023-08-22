@@ -5,6 +5,7 @@ using HomeExchange_Web.Services.IServices;
 using AutoMapper;
 using HomeExchange_Web.Models.Dto;
 using Newtonsoft.Json;
+using HomeExchange_Utility;
 
 namespace HomeExchange_Web.Controllers;
 
@@ -22,7 +23,7 @@ public class HomeController : Controller
         {
              List<HomeDTO> list = new();
             
-            var response = await _homeService.GetAllAsync<APIResponse>();
+            var response = await _homeService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
            
             if (response != null && response.IsSuccess)
             {

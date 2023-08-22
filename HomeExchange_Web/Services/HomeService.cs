@@ -16,56 +16,56 @@ namespace HomeExchange_Web.Services
             HomeUrl = configuration.GetValue<string>("ServiceUrls:HomeAPI");
         }
 
-        public Task<T> CreateAsync<T>(HomeCreateDTO dto)
+        public Task<T> CreateAsync<T>(HomeCreateDTO dto, string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.POST,
                 Data = dto,
                 Url = HomeUrl + "/api/HomeExchangeAPI",
-                // Token = token
+                Token = token
             });
         }
 
-        public Task<T> DeleteAsync<T>(int id)
+        public Task<T> DeleteAsync<T>(int id, string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.DELETE,
                 Url = HomeUrl + "/api/HomeExchangeAPI/" + id,
-                // Token = token
+                Token = token
             });
         }
 
-        public Task<T> GetAllAsync<T>()
+        public Task<T> GetAllAsync<T>(string token)
         {
             Console.WriteLine("here her 42");
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
                 Url = HomeUrl + "/api/HomeExchangeAPI",
-                // Token = token
+                Token = token
             });
         }
 
-        public Task<T> GetAsync<T>(int id)
+        public Task<T> GetAsync<T>(int id,string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
                 Url = HomeUrl + "/api/HomeExchangeAPI/" + id,
-                // Token = token
+                Token = token
             });
         }
 
-        public Task<T> UpdateAsync<T>(HomeUpdateDTO dto)
+        public Task<T> UpdateAsync<T>(HomeUpdateDTO dto,string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.PUT,
                 Data = dto,
                 Url = HomeUrl + "/api/HomeExchangeAPI/" + dto.Id,
-                // Token = token
+                Token = token
             }) ;
         }
     }

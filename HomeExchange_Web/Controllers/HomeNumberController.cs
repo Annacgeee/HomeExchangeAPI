@@ -6,6 +6,8 @@ using HomeExchange_Web.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
+using HomeExchange_Utility;
 
 namespace HomeExchange_Web.Controllers
 {
@@ -27,7 +29,7 @@ namespace HomeExchange_Web.Controllers
         {
             List<HomeNumberDTO> list = new();
 
-            var response = await _HomeNumberService.GetAllAsync<APIResponse>();
+            var response = await _HomeNumberService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 list = JsonConvert.DeserializeObject<List<HomeNumberDTO>>(Convert.ToString(response.Result));
@@ -35,10 +37,11 @@ namespace HomeExchange_Web.Controllers
             return View(list);
         }
 
+        [Authorize(Roles="admin")]
         public async Task<IActionResult> CreateHomeNumber()
         {
             HomeNumberCreateVM homeNumberVM = new HomeNumberCreateVM();
-            var response = await _HomeService.GetAllAsync<APIResponse>();
+            var response = await _HomeService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 homeNumberVM.HomeList = JsonConvert.DeserializeObject<List<HomeDTO>>(Convert.ToString(response.Result)).Select(i => new SelectListItem{
@@ -48,7 +51,8 @@ namespace HomeExchange_Web.Controllers
 }
             return View(homeNumberVM);
         }
-
+        
+[Authorize(Roles="admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
           public async Task<IActionResult> CreateHomeNumber(HomeNumberCreateVM model)
@@ -69,7 +73,7 @@ namespace HomeExchange_Web.Controllers
             }
             }
 
-                var resp = await _HomeService.GetAllAsync<APIResponse>();
+                var resp = await _HomeService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (resp != null && resp.IsSuccess)
             {
                 model.HomeList = JsonConvert.DeserializeObject<List<HomeDTO>>(Convert.ToString(resp.Result)).Select(i => new SelectListItem{
@@ -81,7 +85,7 @@ namespace HomeExchange_Web.Controllers
 
             return View(model);
         }
-
+[Authorize(Roles="admin")]
           public async Task<IActionResult> UpdateHomeNumber(int homeNo)
         {
             HomeNumberUpdateVM homeNumberVM = new HomeNumberUpdateVM();
@@ -93,7 +97,7 @@ namespace HomeExchange_Web.Controllers
                 homeNumberVM.HomeNumber = _mapper.Map<HomeNumberUpdateDTO>(model); 
             }
 
-             response = await _HomeService.GetAllAsync<APIResponse>();
+             response = await _HomeService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 homeNumberVM.HomeList = JsonConvert.DeserializeObject<List<HomeDTO>>(Convert.ToString(response.Result)).Select(i => new SelectListItem{
@@ -105,6 +109,7 @@ namespace HomeExchange_Web.Controllers
             return NotFound();
         }
 
+[Authorize(Roles="admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
           public async Task<IActionResult> UpdateHomeNumber(HomeNumberUpdateVM model)
@@ -125,7 +130,7 @@ namespace HomeExchange_Web.Controllers
             }
             }
 
-                var resp = await _HomeService.GetAllAsync<APIResponse>();
+                var resp = await _HomeService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (resp != null && resp.IsSuccess)
             {
                 model.HomeList = JsonConvert.DeserializeObject<List<HomeDTO>>(Convert.ToString(resp.Result)).Select(i => new SelectListItem{
@@ -138,6 +143,7 @@ namespace HomeExchange_Web.Controllers
             return View(model);
         }
 
+[Authorize(Roles="admin")]
           public async Task<IActionResult> DeleteHomeNumber(int homeNo)
         {
 
@@ -150,7 +156,7 @@ namespace HomeExchange_Web.Controllers
                 homeNumberVM.HomeNumber = model; 
             }
 
-             response = await _HomeService.GetAllAsync<APIResponse>();
+             response = await _HomeService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 homeNumberVM.HomeList = JsonConvert.DeserializeObject<List<HomeDTO>>(Convert.ToString(response.Result)).Select(i => new SelectListItem{
@@ -161,7 +167,7 @@ namespace HomeExchange_Web.Controllers
 }
             return NotFound();
         }
-
+[Authorize(Roles="admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
           public async Task<IActionResult> DeleteHomeNumber(HomeNumberDeleteVM model)

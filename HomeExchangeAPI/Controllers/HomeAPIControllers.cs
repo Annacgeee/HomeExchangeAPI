@@ -25,8 +25,12 @@ namespace HomeExchangeAPI.Controllers.v1
             _mapper = mapper;
             this._response = new();
         }
+
         [HttpGet]
+       
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<APIResponse>> getHomes() {
             try {
             IEnumerable<Home> homeList = await _dbHome.GetAllAsync();
@@ -45,7 +49,10 @@ namespace HomeExchangeAPI.Controllers.v1
             }
         
         [HttpGet("{id:int}", Name="GetHome")]
+       
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> GetHome(int id) {
@@ -78,6 +85,7 @@ namespace HomeExchangeAPI.Controllers.v1
         }
 
         [HttpPost]
+        [Authorize(Role="admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -123,10 +131,12 @@ namespace HomeExchangeAPI.Controllers.v1
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-      
         [HttpDelete("{id:int}", Name = "DeleteHome")]
+        [Authorize(Role="admin")]
         public async Task<ActionResult<APIResponse>> DeleteHome(int id){
             try {
             if (id == 0) {
@@ -153,6 +163,7 @@ namespace HomeExchangeAPI.Controllers.v1
         }
 
         [HttpPut("{id:int}", Name="UpdateHome")]
+        [Authorize(Role="admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse>> UpdateHome(int id, [FromBody]HomeUpdateDTO updateDTO){

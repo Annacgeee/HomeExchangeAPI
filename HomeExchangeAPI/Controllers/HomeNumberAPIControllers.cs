@@ -97,6 +97,7 @@ namespace HomeExchangeAPI.Controllers.v1
 
        
         [HttpPost]
+        [Authorize(Role="admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -136,7 +137,7 @@ namespace HomeExchangeAPI.Controllers.v1
             }
             return _response;
         }
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -167,7 +168,7 @@ namespace HomeExchangeAPI.Controllers.v1
             }
             return _response;
         }
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [HttpPut("{id:int}", Name = "UpdateHomeNumber")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

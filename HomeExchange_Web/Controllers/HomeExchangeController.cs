@@ -1,7 +1,9 @@
 using AutoMapper;
+using HomeExchange_Utility;
 using HomeExchange_Web.Models;
 using HomeExchange_Web.Models.Dto;
 using HomeExchange_Web.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -22,7 +24,7 @@ namespace HomeExchange_Web.Controllers
         {
              List<HomeDTO> list = new();
             
-            var response = await _homeService.GetAllAsync<APIResponse>();
+            var response = await _homeService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
            
             if (response != null && response.IsSuccess)
             {
@@ -31,19 +33,20 @@ namespace HomeExchange_Web.Controllers
             return View(list);
         }
 
+        [Authorize(Roles="admin")]
           public async Task<IActionResult> CreateHomeExchange()
         {
             
             return View();
         }
-
+        [Authorize(Roles="admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
           public async Task<IActionResult> CreateHomeExchange(HomeCreateDTO model)
         {
             if (ModelState.IsValid)
             {
-                var response = await _homeService.CreateAsync<APIResponse>(model);
+                var response = await _homeService.CreateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
            
             if (response != null && response.IsSuccess)
             {
@@ -55,9 +58,10 @@ namespace HomeExchange_Web.Controllers
             return View(model);
         }
 
+        [Authorize(Roles="admin")]
           public async Task<IActionResult> UpdateHomeExchange(int homeId)
         {
-            var response = await _homeService.GetAsync<APIResponse>(homeId);
+            var response = await _homeService.GetAsync<APIResponse>(homeId,HttpContext.Session.GetString(SD.SessionToken));
            
             if (response != null && response.IsSuccess)
             {
@@ -67,13 +71,14 @@ namespace HomeExchange_Web.Controllers
             return NotFound();
         }
 
+        [Authorize(Roles="admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
           public async Task<IActionResult> UpdateHomeExchange(HomeUpdateDTO model)
         {
             if (ModelState.IsValid)
             {
-                var response = await _homeService.UpdateAsync<APIResponse>(model);
+                var response = await _homeService.UpdateAsync<APIResponse>(model,HttpContext.Session.GetString(SD.SessionToken));
            
             if (response != null && response.IsSuccess)
             {
@@ -85,6 +90,7 @@ namespace HomeExchange_Web.Controllers
             return View(model);
         }
 
+        [Authorize(Roles="admin")]
           public async Task<IActionResult> DeleteHomeExchange(int homeId)
         {
             var response = await _homeService.GetAsync<APIResponse>(homeId);
@@ -97,6 +103,7 @@ namespace HomeExchange_Web.Controllers
             return NotFound();
         }
 
+        [Authorize(Roles="admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
           public async Task<IActionResult> DeleteHomeExchange(HomeDTO model)

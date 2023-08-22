@@ -13,7 +13,7 @@ namespace HomeExchangeAPI.Data
 
         // public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
-        // public DbSet<LocalUser> LocalUsers { get; set; }
+        public DbSet<LocalUser> LocalUsers { get; set; }
         public DbSet<Home> Homes { get; set; }
         public DbSet<HomeNumber> HomeNumbers { get; set; }
 

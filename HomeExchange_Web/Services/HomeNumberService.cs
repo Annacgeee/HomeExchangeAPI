@@ -16,56 +16,56 @@ namespace HomeExchange_Web.Services
             HomeUrl = configuration.GetValue<string>("ServiceUrls:HomeAPI");
         }
 
-        public Task<T> CreateAsync<T>(HomeNumberCreateDTO dto)
+        public Task<T> CreateAsync<T>(HomeNumberCreateDTO dto, string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.POST,
                 Data = dto,
                 Url = HomeUrl + "/api/HomeNumberAPI",
-                // Token = token
+                Token = token
             });
         }
 
-        public Task<T> DeleteAsync<T>(int id)
+        public Task<T> DeleteAsync<T>(int id,string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.DELETE,
                 Url = HomeUrl + "/api/HomeNumberAPI" + id,
-                // Token = token
+                Token = token
             });
         }
 
-        public Task<T> GetAllAsync<T>()
+        public Task<T> GetAllAsync<T>(string token)
         {
             Console.WriteLine("here her 42");
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
                 Url = HomeUrl + "/api/HomeNumberAPI",
-                // Token = token
+                Token = token
             });
         }
 
-        public Task<T> GetAsync<T>(int id)
+        public Task<T> GetAsync<T>(int id,string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
                 Url = HomeUrl + "/api/HomeNumberAPI" + id,
-                // Token = token
+                Token = token
             });
         }
 
-        public Task<T> UpdateAsync<T>(HomeNumberUpdateDTO dto)
+        public Task<T> UpdateAsync<T>(HomeNumberUpdateDTO dto,string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.PUT,
                 Data = dto,
                 Url = HomeUrl + "/api/HomeNumberAPI" + dto.HomeNo,
-                // Token = token
+                Token = token
             }) ;
         }
     }
