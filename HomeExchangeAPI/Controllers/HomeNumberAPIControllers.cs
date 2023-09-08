@@ -11,9 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HomeExchangeAPI.Controllers.v1
 {
-    [Route("api/HomeNumberAPI")]
+    [Route("api/v{version:apiVersion}/HomeNumberAPI")]
     [ApiController]
-    // [ApiVersion("1.0")]
+    [ApiVersion("1.0")]
 
     public class HomeNumberAPIController : ControllerBase
     {

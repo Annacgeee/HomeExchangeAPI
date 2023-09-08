@@ -59,7 +59,7 @@ namespace HomeExchange_Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _HomeNumberService.CreateAsync<APIResponse>(model.HomeNumber);
+                var response = await _HomeNumberService.CreateAsync<APIResponse>(model.HomeNumber,HttpContext.Session.GetString(SD.SessionToken));
            
             if (response != null && response.IsSuccess)
             {
@@ -89,7 +89,7 @@ namespace HomeExchange_Web.Controllers
           public async Task<IActionResult> UpdateHomeNumber(int homeNo)
         {
             HomeNumberUpdateVM homeNumberVM = new HomeNumberUpdateVM();
-            var response = await _HomeNumberService.GetAsync<APIResponse>(homeNo);
+            var response = await _HomeNumberService.GetAsync<APIResponse>(homeNo,HttpContext.Session.GetString(SD.SessionToken));
            
             if (response != null && response.IsSuccess)
             {
@@ -116,7 +116,7 @@ namespace HomeExchange_Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _HomeNumberService.UpdateAsync<APIResponse>(model.HomeNumber);
+                var response = await _HomeNumberService.UpdateAsync<APIResponse>(model.HomeNumber,HttpContext.Session.GetString(SD.SessionToken));
            
             if (response != null && response.IsSuccess)
             {
@@ -148,7 +148,7 @@ namespace HomeExchange_Web.Controllers
         {
 
             HomeNumberDeleteVM homeNumberVM = new();
-            var response = await _HomeNumberService.GetAsync<APIResponse>(homeNo);
+            var response = await _HomeNumberService.GetAsync<APIResponse>(homeNo,HttpContext.Session.GetString(SD.SessionToken));
            
             if (response != null && response.IsSuccess)
             {
@@ -173,7 +173,7 @@ namespace HomeExchange_Web.Controllers
           public async Task<IActionResult> DeleteHomeNumber(HomeNumberDeleteVM model)
         {
             
-            var response = await _HomeNumberService.DeleteAsync<APIResponse>(model.HomeNumber.HomeNo);
+            var response = await _HomeNumberService.DeleteAsync<APIResponse>(model.HomeNumber.HomeNo,HttpContext.Session.GetString(SD.SessionToken));
            
             if (response != null && response.IsSuccess)
             {

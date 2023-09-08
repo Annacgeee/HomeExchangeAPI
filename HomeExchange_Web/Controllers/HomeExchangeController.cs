@@ -93,7 +93,7 @@ namespace HomeExchange_Web.Controllers
         [Authorize(Roles="admin")]
           public async Task<IActionResult> DeleteHomeExchange(int homeId)
         {
-            var response = await _homeService.GetAsync<APIResponse>(homeId);
+            var response = await _homeService.GetAsync<APIResponse>(homeId,HttpContext.Session.GetString(SD.SessionToken));
            
             if (response != null && response.IsSuccess)
             {
@@ -109,7 +109,7 @@ namespace HomeExchange_Web.Controllers
           public async Task<IActionResult> DeleteHomeExchange(HomeDTO model)
         {
             
-            var response = await _homeService.DeleteAsync<APIResponse>(model.Id);
+            var response = await _homeService.DeleteAsync<APIResponse>(model.Id,HttpContext.Session.GetString(SD.SessionToken));
            
             if (response != null && response.IsSuccess)
             {
